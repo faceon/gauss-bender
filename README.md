@@ -1,4 +1,4 @@
-# Bell Curve Bender
+# Gauss Bender
 
 An interactive Galton board simulator where you tilt individual pegs to bend the resulting distribution away from the classic bell curve, exploring probability, variance, and standard deviation.
 

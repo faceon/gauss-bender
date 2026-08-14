@@ -874,7 +874,13 @@ body {
     0 4px 0 var(--accent-green-dark),
     0 6px 10px rgba(0, 0, 0, 0.4),
     inset 0 1px 1px rgba(255, 255, 255, 0.5);
-  padding: 0 clamp(7px, 1.2vw, 12px);
+  /* Bumped past the shared .btn-arcade sizing (min-height overrides its
+     smaller height on narrow phones) so this primary action clears the
+     ~44px touch-target minimum instead of missing taps on mobile. */
+  min-height: 42px;
+  min-width: 58px;
+  font-size: clamp(12px, 1.6vh, 14px);
+  padding: 0 clamp(10px, 1.6vw, 16px);
 }
 
 .btn-drop-custom:hover {

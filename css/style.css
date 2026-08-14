@@ -163,6 +163,13 @@ body {
   height: auto;
   z-index: 2;
   pointer-events: none;
+  /* Lets HUD overlays (title, settings dial) size themselves off the
+     board's own rendered box via cqh/cqw instead of the raw viewport.
+     Needed because on a tall portrait phone the board is letterboxed
+     down to a fraction of the viewport height, so vh-based sizing would
+     make the title balloon far past what fits the actual board. */
+  container-type: size;
+  container-name: board;
 }
 
 .board-frame::after {
@@ -219,7 +226,7 @@ body {
 
 .board-title {
   font-family: 'Caveat', 'Comic Sans MS', cursive;
-  font-size: clamp(24px, 4.6vh, 38px);
+  font-size: clamp(14px, 8.5cqh, 38px);
   font-weight: 700;
   letter-spacing: 0.4px;
   line-height: 1;

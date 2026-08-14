@@ -6,11 +6,13 @@ import {
   buildBinBalls,
   computeExpected,
 } from './math.js'
+import { pegTick, ballLand as playBallLand } from './audio.js'
 
 var Engine = Matter.Engine
 var Composite = Matter.Composite
 var Bodies = Matter.Bodies
 var Body = Matter.Body
+var Events = Matter.Events
 
 export var engine = Engine.create()
 export var world = engine.world
@@ -19,6 +21,20 @@ world.gravity.y = 1
 export var activeBalls = []
 export var currentL = null
 export var dropTimers = []
+
+// Soft "tick" whenever a falling ball bounces off a peg. Throttled inside
+// pegTick() so a large batch of simultaneous balls stays subtle rather than
+// turning into a wall of noise.
+Events.on(engine, 'collisionStart', function (event) {
+  var pairs = event.pairs
+  for (var i = 0; i < pairs.length; i++) {
+    var a = pairs[i].bodyA
+    var b = pairs[i].bodyB
+    if ((a.isBall && b.isPeg) || (a.isPeg && b.isBall)) {
+      pegTick(activeBalls.length)
+    }
+  }
+})
 
 export function clearDropTimers() {
   for (var i = 0; i < dropTimers.length; i++) {
@@ -92,6 +108,7 @@ export function landBall(bin, path) {
   state.binCounts[bin] += 1
   state.binBalls[bin].push(path.slice())
   state.total += 1
+  playBallLand()
   updateStats()
 }
 

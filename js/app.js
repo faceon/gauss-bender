@@ -20,6 +20,12 @@ import {
   clearDropTimers,
 } from './physics.js'
 import { draw, landedBallScreens } from './renderer.js'
+import {
+  sliderTick,
+  buttonClick,
+  isSoundEnabled,
+  setSoundEnabled,
+} from './audio.js'
 
 var Composite = Matter.Composite
 var Engine = Matter.Engine
@@ -280,6 +286,7 @@ function startDrag(clientX, clientY, isShift) {
       startProb: state.pegProb[peg.row][peg.idx],
       initialProbs: initialProbs,
       selectedPegs: selectedPegs.slice(),
+      lastTickStep: Math.round(state.pegProb[peg.row][peg.idx] * 20),
     }
   } else {
     hoveredPeg = null
@@ -327,6 +334,7 @@ function moveDrag(clientX, clientY) {
     var deltaX = c.x - dragState.startX
     var dragRange = 90
     var deltaProb = deltaX / dragRange
+    var repProb
 
     if (dragState.selectedPegs && dragState.selectedPegs.length > 0) {
       for (var j = 0; j < dragState.selectedPegs.length; j++) {
@@ -339,10 +347,21 @@ function moveDrag(clientX, clientY) {
         var newP = Math.max(0, Math.min(1, baseP + deltaProb))
         state.pegProb[pegItem.row][pegItem.idx] = newP
       }
+      repProb = Math.max(0, Math.min(1, dragState.startProb + deltaProb))
     } else {
       var newProb = Math.max(0, Math.min(1, dragState.startProb + deltaProb))
       state.pegProb[dragState.row][dragState.idx] = newProb
+      repProb = newProb
     }
+
+    // Tick each time the drag crosses a 0.05 step, giving the same soft
+    // ratchet feedback as the P(left) slider.
+    var stepIdx = Math.round(repProb * 20)
+    if (dragState.lastTickStep !== stepIdx) {
+      dragState.lastTickStep = stepIdx
+      sliderTick()
+    }
+
     updateStats()
     updateRotateUI()
   }
@@ -398,6 +417,7 @@ function setNRows(val) {
 
 if (nSliderEl) {
   nSliderEl.addEventListener('input', function (e) {
+    sliderTick()
     setNRows(e.target.value)
   })
 }
@@ -453,6 +473,7 @@ if (bulkRotateInput) {
   )
   bulkRotateInput.addEventListener('input', function (e) {
     isSliderActive = true
+    sliderTick()
     applyPegRotation(e.target.value, true)
     if (selectedPegs.length > 0) hoveredPeg = selectedPegs[0]
   })
@@ -488,8 +509,18 @@ if (bulkRotateOut) {
 document
   .getElementById('theory-toggle')
   .addEventListener('change', function (e) {
+    sliderTick()
     state.showTheory = e.target.checked
   })
+
+var soundToggleEl = document.getElementById('sound-toggle')
+if (soundToggleEl) {
+  soundToggleEl.checked = isSoundEnabled()
+  soundToggleEl.addEventListener('change', function (e) {
+    setSoundEnabled(e.target.checked)
+    if (e.target.checked) sliderTick()
+  })
+}
 
 var settingsToggle = document.getElementById('settings-toggle')
 var settingsPopover = document.getElementById('settings-popover')
@@ -509,9 +540,19 @@ function toggleSettingsPopover() {
 if (settingsToggle) {
   settingsToggle.addEventListener('click', function (e) {
     e.stopPropagation()
+    buttonClick()
     toggleSettingsPopover()
   })
 }
+
+// Soft mechanical click on every arcade button press.
+document
+  .querySelectorAll('.btn-arcade')
+  .forEach(function (el) {
+    el.addEventListener('click', function () {
+      buttonClick()
+    })
+  })
 
 document.addEventListener('click', function (e) {
   if (
@@ -582,6 +623,7 @@ function stopDropCountSpin() {
 
 function startDropCountSpin(direction) {
   stopDropCountSpin()
+  buttonClick()
   stepDropCount(direction)
   var holdTicks = 0
   var tick = function () {

@@ -11,7 +11,7 @@
    - Maintain the sign in `drawPeg()`: `angle = (pLeft - 0.5) * 2 * maxAngle`.
 
 3. **Canvas Resolution and Coordinate Scaling**
-   - Fixed logical resolution `640x460` (`width: 100%` responsive).
+   - Fixed logical resolution `640x414` (`width: 100%` responsive).
    - Coordinate calculations must use `getBoundingClientRect()` scaling (`getCanvasCoords`).
 
 4. **Tech Stack Constraints**

@@ -1,5 +1,5 @@
 export var W = 640;
-export var H = 460;
+export var H = 414;
 export var PEG_R = 5;
 
 export var COLOR_PEG = '#888780';

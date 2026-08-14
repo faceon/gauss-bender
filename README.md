@@ -26,4 +26,4 @@ Caches JS/CSS aggressively — after editing files, hard refresh (Cmd/Ctrl+Shift
 - **Path Inspection**:
   - Hover over landed balls to view their step-by-step L/R trajectory.
   - Hover over pegs to highlight all balls that passed through them.
-- **Batch Drop & Clear**: Drop balls individually (`+1`), in custom batches (e.g. 50), or clear the board at any time.
+- **Batch Drop & Clear**: Drop balls in custom batches (e.g. 50) or clear the board at any time.

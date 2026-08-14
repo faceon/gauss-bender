@@ -633,11 +633,6 @@ body {
   box-shadow: 0 0 0 transparent;
 }
 
-.btn-drop-1 {
-  min-width: 30px;
-  background: #ffffff;
-}
-
 .custom-drop-input {
   width: clamp(34px, 6vw, 40px);
   height: clamp(28px, 3.8vh, 34px);

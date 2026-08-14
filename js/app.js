@@ -483,33 +483,15 @@ document.getElementById('reset-pegs').addEventListener('click', function () {
   updateRotateUI()
 })
 
-function getDropCountFromElement(el) {
-  if (!el) return 1
-  var text = el.textContent || el.innerText || ''
-  var num = parseInt(text.replace(/[^0-9]/g, ''), 10)
-  return isNaN(num) || num < 1 ? 1 : num
+var dropCustomBtn = document.getElementById('drop-custom')
+if (dropCustomBtn) {
+  dropCustomBtn.addEventListener('click', function () {
+    var input = document.getElementById('custom-drop-count')
+    var val = input ? parseInt(input.value, 10) : 50
+    var count = isNaN(val) || val < 1 ? 1 : val
+    dropPhysics(count)
+  })
 }
-
-function handleDropClick(e) {
-  var count = getDropCountFromElement(e.currentTarget)
-  dropPhysics(count)
-}
-
-;['drop-1', 'drop-custom'].forEach(function (id) {
-  var btn = document.getElementById(id)
-  if (btn) {
-    btn.addEventListener('click', function (e) {
-      if (id === 'drop-custom') {
-        var input = document.getElementById('custom-drop-count')
-        var val = input ? parseInt(input.value, 10) : 50
-        var count = isNaN(val) || val < 1 ? 1 : val
-        dropPhysics(count)
-      } else {
-        handleDropClick(e)
-      }
-    })
-  }
-})
 
 // Prevent HUD interactions from triggering canvas drag / box-select
 document.querySelectorAll('.hud-overlay, .arcade-deck').forEach(function (el) {

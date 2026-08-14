@@ -10,94 +10,116 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Cinzel+Decorative:wght@700&family=Rye&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="css/style.css?v=10" />
+    <link rel="stylesheet" href="css/style.css?v=13" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
   </head>
   <body>
+    <!-- Hidden filter that roughens the chalk title's edges with noise-based
+         displacement, so the lettering reads as chalk strokes rather than
+         clean vector type. -->
+    <svg width="0" height="0" style="position: absolute" aria-hidden="true">
+      <filter id="chalk-roughen" x="-20%" y="-30%" width="140%" height="160%">
+        <feTurbulence
+          type="fractalNoise"
+          baseFrequency="0.85"
+          numOctaves="2"
+          seed="7"
+          result="noise"
+        />
+        <feDisplacementMap in="SourceGraphic" in2="noise" scale="2.4" />
+      </filter>
+    </svg>
+
     <!-- Main Game Cabinet Layout -->
     <main class="game-container">
       <div class="game-cabinet">
         <!-- Board Visual Area -->
         <div class="board-section">
-          <!-- Floating In-Board Branding (Top Left overlaying canvas) -->
-          <div class="hud-overlay hud-top-left">
-            <h1 class="board-title">Gauss Bender</h1>
-          </div>
-
-          <!-- Floating In-Board HUD Panel (Top Right overlaying canvas) -->
-          <div class="hud-overlay hud-top-right">
-            <div class="settings-widget">
-              <button
-                type="button"
-                id="settings-toggle"
-                class="settings-btn"
-                aria-label="Board Settings"
-                aria-expanded="false"
-              >
-                <svg
-                  viewBox="0 0 24 24"
-                  width="16"
-                  height="16"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <circle cx="12" cy="12" r="3"></circle>
-                  <path
-                    d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"
-                  ></path>
-                </svg>
-              </button>
-              <div class="settings-popover" id="settings-popover">
-                <div class="settings-popover-title">Board Settings</div>
-                <div class="hud-row">
-                  <span class="hud-label">Rows (N)</span>
-                  <input
-                    type="range"
-                    id="n-slider"
-                    class="hud-slider"
-                    min="1"
-                    max="50"
-                    value="10"
-                    step="1"
-                    autocomplete="off"
-                  />
-                  <input
-                    type="number"
-                    id="n-out"
-                    class="hud-badge-input"
-                    min="1"
-                    max="50"
-                    value="10"
-                    autocomplete="off"
-                  />
-                </div>
-                <div class="settings-row-toggle">
-                  <span class="hud-label">Expected Curve</span>
-                  <label class="curve-toggle" for="theory-toggle">
-                    <input
-                      type="checkbox"
-                      id="theory-toggle"
-                      class="curve-toggle-input"
-                      checked
-                    />
-                    <span class="curve-toggle-track"
-                      ><span class="curve-toggle-thumb"></span
-                    ></span>
-                  </label>
-                </div>
-              </div>
-            </div>
-          </div>
-
           <!-- Canvas Viewport -->
           <div class="canvas-wrapper">
             <canvas id="board"></canvas>
+
+            <!-- Sizer that exactly matches the canvas's rendered box, so the
+                 chalk title and settings dial sit inside the chalkboard
+                 itself rather than the wood frame around it. -->
+            <div class="board-frame">
+              <!-- Chalk-written branding, top-left inside the board -->
+              <div class="hud-overlay hud-top-left">
+                <h1 class="board-title">Gauss Bender</h1>
+              </div>
+
+              <!-- Settings dial, top-right inside the board -->
+              <div class="hud-overlay hud-top-right">
+                <div class="settings-widget">
+                  <button
+                    type="button"
+                    id="settings-toggle"
+                    class="settings-btn"
+                    aria-label="Board Settings"
+                    aria-expanded="false"
+                  >
+                    <svg
+                      viewBox="0 0 24 24"
+                      width="16"
+                      height="16"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <circle cx="12" cy="12" r="3"></circle>
+                      <path
+                        d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"
+                      ></path>
+                    </svg>
+                  </button>
+                  <div class="settings-popover" id="settings-popover">
+                    <div class="settings-popover-title">Board Settings</div>
+                    <div class="hud-row">
+                      <span class="hud-label">Rows (N)</span>
+                      <input
+                        type="range"
+                        id="n-slider"
+                        class="hud-slider"
+                        min="1"
+                        max="50"
+                        value="10"
+                        step="1"
+                        autocomplete="off"
+                      />
+                      <input
+                        type="number"
+                        id="n-out"
+                        class="hud-badge-input"
+                        min="1"
+                        max="50"
+                        value="10"
+                        autocomplete="off"
+                      />
+                    </div>
+                    <div class="settings-row-toggle">
+                      <span class="hud-label">Expected Curve</span>
+                      <label class="curve-toggle" for="theory-toggle">
+                        <input
+                          type="checkbox"
+                          id="theory-toggle"
+                          class="curve-toggle-input"
+                          checked
+                        />
+                        <span class="curve-toggle-track"
+                          ><span class="curve-toggle-thumb"></span
+                        ></span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <div id="ball-tooltip" class="tooltip">
               <div id="tooltip-label" class="tooltip-label"></div>
               <div id="tooltip-path" class="tooltip-path"></div>

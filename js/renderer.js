@@ -74,6 +74,14 @@ export function drawPeg(
   var maxAngle = (48 * Math.PI) / 180
   var angle = bias * 2 * maxAngle
 
+  // 0. Grounding shadow on the felt beneath the peg dome
+  ctx.save()
+  ctx.beginPath()
+  ctx.ellipse(x, y + baseR * 0.16, baseR * 1.05, baseR * 0.34, 0, 0, Math.PI * 2)
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.38)'
+  ctx.fill()
+  ctx.restore()
+
   // 1. Hover background aura (clearly visible on hover and drag)
   var ringPadding = Math.max(2.5, baseR * 0.38)
   if (isShiftHover) {
@@ -260,7 +268,7 @@ export function drawHoverPath(ctx, L, hit) {
   ctx.lineWidth = 2
   for (var s = 0; s < points.length - 1; s++) {
     var color =
-      s === 0 ? '#888780' : hit.path[s - 1] === 'L' ? COLOR_L : COLOR_R
+      s === 0 ? COLOR_PEG : hit.path[s - 1] === 'L' ? COLOR_L : COLOR_R
     ctx.beginPath()
     ctx.moveTo(points[s].x, points[s].y)
     ctx.lineTo(points[s + 1].x, points[s + 1].y)
@@ -436,7 +444,7 @@ export function draw(
 
   // Draw bin dividers and bottom baseline
   ctx.save()
-  ctx.strokeStyle = '#cac8bd'
+  ctx.strokeStyle = 'rgba(238, 205, 130, 0.28)'
   ctx.lineWidth = 1
   ctx.beginPath()
   for (var divIdx = 0; divIdx <= L.N + 1; divIdx++) {
@@ -483,6 +491,22 @@ export function draw(
   for (var j = 0; j <= L.N; j++) {
     var bx = binX(L, j)
     var balls = state.binBalls[j]
+    if (balls.length > 0) {
+      ctx.save()
+      ctx.beginPath()
+      ctx.ellipse(
+        bx,
+        L.barsBottomY - 1,
+        rBallScaled * 1.15,
+        rBallScaled * 0.32,
+        0,
+        0,
+        Math.PI * 2,
+      )
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.4)'
+      ctx.fill()
+      ctx.restore()
+    }
     for (var idx = 0; idx < balls.length; idx++) {
       var by = L.barsBottomY - rBallScaled - idx * yStep
       drawSteelBall(ctx, bx, by, rBallScaled)
@@ -522,8 +546,8 @@ export function draw(
 
       // Smooth gradient fill under Monotone Cubic curve
       var grad = ctx.createLinearGradient(0, L.landY, 0, L.barsBottomY)
-      grad.addColorStop(0, 'rgba(100, 116, 139, 0.18)')
-      grad.addColorStop(1, 'rgba(100, 116, 139, 0.02)')
+      grad.addColorStop(0, 'rgba(238, 205, 130, 0.22)')
+      grad.addColorStop(1, 'rgba(238, 205, 130, 0.02)')
 
       ctx.beginPath()
       ctx.moveTo(pts[0].x, L.barsBottomY)
@@ -576,7 +600,7 @@ export function draw(
     }
   }
 
-  ctx.fillStyle = '#5f5e5a'
+  ctx.fillStyle = '#e7dcc4'
   ctx.font = '11px sans-serif'
   ctx.textAlign = 'center'
   for (var j3 = 0; j3 <= L.N; j3++)

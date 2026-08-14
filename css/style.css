@@ -516,40 +516,7 @@ body {
   border: 1px solid rgba(0, 0, 0, 0.1);
 }
 
-.btn-neutralize {
-  font-family: inherit;
-  font-size: clamp(9.5px, 1.2vh, 11px);
-  font-weight: 600;
-  padding: 0 clamp(5px, 1vw, 8px);
-  height: clamp(22px, 3.2vh, 26px);
-  background: var(--surface-2);
-  border: 1px solid var(--border-strong);
-  border-radius: var(--radius-sm);
-  color: var(--text-secondary);
-  box-shadow: 0 2px 0 var(--border-strong);
-  white-space: nowrap;
-  cursor: pointer;
-  flex: 0 0 auto;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  transition:
-    transform 0.08s ease,
-    box-shadow 0.08s ease,
-    background 0.15s ease,
-    color 0.15s ease;
-}
 
-.btn-neutralize:hover {
-  background: #fbfbfa;
-  color: var(--text-primary);
-  border-color: #a8a29e;
-}
-
-.btn-neutralize:active {
-  transform: translateY(2px);
-  box-shadow: 0 0 0 transparent;
-}
 
 /* Ball Controls Bar */
 .deck-bar-balls {
@@ -711,15 +678,26 @@ body {
 }
 
 .btn-reset {
+  height: clamp(22px, 3.2vh, 26px);
+  font-size: clamp(10px, 1.3vh, 11.5px);
+  padding: 0 clamp(6px, 1vw, 10px);
   background: #fff1f2;
   border-color: #fecdd3;
   color: #be123c;
-  box-shadow: 0 2px 0 #fecdd3;
+  box-shadow: 0 1.5px 0 #fecdd3;
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+  flex: 0 0 auto;
 }
 
 .btn-reset:hover {
   background: #ffe4e6;
   border-color: #fda4af;
+}
+
+.btn-reset:active {
+  transform: translateY(1.5px);
+  box-shadow: 0 0 0 transparent;
 }
 
 /* =========================================================
@@ -844,10 +822,11 @@ body {
       font-size: 11px;
       width: 36px;
     }
-    .btn-neutralize {
-      height: 22px;
+    .btn-reset {
+      height: 20px;
       font-size: 9px;
       padding: 0 5px;
+      box-shadow: 0 1px 0 #fecdd3;
     }
     .btn-arcade {
       height: 28px;

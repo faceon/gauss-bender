@@ -14,14 +14,14 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
   </head>
   <body>
-    <!-- Header Title (Galton Era Classic Serif) -->
-    <header class="app-header">
-      <h1 class="app-title">Bell Curve Bender</h1>
-    </header>
-
     <!-- Main Game Cabinet Layout -->
     <main class="game-container">
       <div class="game-cabinet">
+        <!-- Floating In-Board Branding (Top Left overlaying canvas) -->
+        <div class="hud-overlay hud-top-left">
+          <h1 class="board-title">Bell Curve Bender</h1>
+        </div>
+
         <!-- Floating In-Board HUD Panel (Top Right overlaying canvas) -->
         <div class="hud-overlay hud-top-right">
           <div class="settings-widget">
@@ -58,7 +58,7 @@
                   class="hud-slider"
                   min="1"
                   max="50"
-                  value="9"
+                  value="10"
                   step="1"
                   autocomplete="off"
                 />
@@ -68,9 +68,23 @@
                   class="hud-badge-input"
                   min="1"
                   max="50"
-                  value="9"
+                  value="10"
                   autocomplete="off"
                 />
+              </div>
+              <div class="settings-row-toggle">
+                <span class="hud-label">Expected Curve</span>
+                <label class="curve-toggle" for="theory-toggle">
+                  <input
+                    type="checkbox"
+                    id="theory-toggle"
+                    class="curve-toggle-input"
+                    checked
+                  />
+                  <span class="curve-toggle-track"
+                    ><span class="curve-toggle-thumb"></span
+                  ></span>
+                </label>
               </div>
             </div>
           </div>
@@ -85,39 +99,9 @@
           </div>
         </div>
 
-        <!-- Bottom Integrated Arcade Deck: 3 unified bars, escalating emphasis downward -->
+        <!-- Bottom Integrated Arcade Deck: 2 unified bars -->
         <div class="arcade-deck">
-          <!-- Bar 1 (smallest): Telemetry + Expected Curve -->
-          <div class="deck-bar deck-bar-stats">
-            <div class="deck-stat-item">
-              <span class="deck-stat-label">Mean</span>
-              <span id="stat-mean" class="deck-stat-val">0.00</span>
-            </div>
-            <div class="deck-stat-divider"></div>
-            <div class="deck-stat-item">
-              <span class="deck-stat-label">Variance</span>
-              <span id="stat-var" class="deck-stat-val">0.00</span>
-            </div>
-            <div class="deck-stat-divider"></div>
-            <div class="deck-stat-item">
-              <span class="deck-stat-label">Std Dev</span>
-              <span id="stat-std" class="deck-stat-val">0.00</span>
-            </div>
-            <div class="deck-stat-divider"></div>
-            <label class="curve-toggle" for="theory-toggle">
-              <input
-                type="checkbox"
-                id="theory-toggle"
-                class="curve-toggle-input"
-              />
-              <span class="curve-toggle-track"
-                ><span class="curve-toggle-thumb"></span
-              ></span>
-              <span class="curve-toggle-text">Expected Curve</span>
-            </label>
-          </div>
-
-          <!-- Bar 2 (medium): Primary Controller — P(left) bias -->
+          <!-- Bar 1 (medium): Primary Controller — P(left) bias -->
           <div class="deck-bar deck-bar-prob primary-control">
             <span id="rotate-label" class="primary-control-label">P(left)</span>
             <input

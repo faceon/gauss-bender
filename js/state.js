@@ -4,7 +4,7 @@ export var state = {
   binCounts: [],
   binBalls: [],
   total: 0,
-  showTheory: false,
+  showTheory: true,
   batchTotal: 0,
   batchSpawned: 0
 };

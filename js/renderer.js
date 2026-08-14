@@ -527,8 +527,8 @@ export function draw(
 
       // Smooth gradient fill under Monotone Cubic curve
       var grad = ctx.createLinearGradient(0, L.landY, 0, L.barsBottomY)
-      grad.addColorStop(0, 'rgba(212, 83, 126, 0.22)')
-      grad.addColorStop(1, 'rgba(212, 83, 126, 0.02)')
+      grad.addColorStop(0, 'rgba(100, 116, 139, 0.18)')
+      grad.addColorStop(1, 'rgba(100, 116, 139, 0.02)')
 
       ctx.beginPath()
       ctx.moveTo(pts[0].x, L.barsBottomY)
@@ -549,7 +549,7 @@ export function draw(
       ctx.fillStyle = grad
       ctx.fill()
 
-      // Monotone Cubic curve stroke
+      // Monotone Cubic curve stroke (dashed)
       ctx.beginPath()
       ctx.moveTo(pts[0].x, pts[0].y)
       for (var i2 = 0; i2 < pts.length - 1; i2++) {
@@ -564,13 +564,15 @@ export function draw(
         )
       }
       ctx.strokeStyle = COLOR_THEORY
-      ctx.lineWidth = 2.5
+      ctx.lineWidth = 2.0
+      ctx.setLineDash([5, 4])
       ctx.stroke()
+      ctx.setLineDash([])
 
       // Point dots on peak points
       for (var pIdx = 0; pIdx < pts.length; pIdx++) {
         ctx.beginPath()
-        ctx.arc(pts[pIdx].x, pts[pIdx].y, 2.5, 0, Math.PI * 2)
+        ctx.arc(pts[pIdx].x, pts[pIdx].y, 2.0, 0, Math.PI * 2)
         ctx.fillStyle = COLOR_THEORY
         ctx.fill()
       }
@@ -579,11 +581,103 @@ export function draw(
     }
   }
 
-  ctx.fillStyle = '#5f5e5a'
-  ctx.font = '11px sans-serif'
+  // 1. Bin index numbers
+  ctx.save()
+  ctx.fillStyle = '#6b7280'
+  ctx.font =
+    '10.5px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
   ctx.textAlign = 'center'
-  for (var j3 = 0; j3 <= L.N; j3++)
-    ctx.fillText(j3, binX(L, j3), L.barsBottomY + 16)
+  ctx.textBaseline = 'middle'
+  for (var j3 = 0; j3 <= L.N; j3++) {
+    ctx.fillText(j3, binX(L, j3), L.barsBottomY + 12)
+  }
+
+  // 2. Telemetry (Mean, Variance, Std Dev) completely inside board canvas
+  var expectedStats = computeExpected(L)
+  var eMean = 0
+  for (var ej = 0; ej <= L.N; ej++) eMean += ej * expectedStats[ej]
+  var eVar = 0
+  for (var ej2 = 0; ej2 <= L.N; ej2++)
+    eVar += expectedStats[ej2] * Math.pow(ej2 - eMean, 2)
+  var eStd = Math.sqrt(eVar)
+
+  var actMean = '-',
+    actVar = '-',
+    actStd = '-'
+  if (state.total > 0) {
+    var sum = 0
+    for (var i = 0; i <= L.N; i++) sum += i * state.binCounts[i]
+    var mean = sum / state.total
+    var vsum = 0
+    for (var i2 = 0; i2 <= L.N; i2++)
+      vsum += state.binCounts[i2] * Math.pow(i2 - mean, 2)
+    var variance = vsum / state.total
+    actMean = mean.toFixed(2)
+    actVar = variance.toFixed(2)
+    actStd = Math.sqrt(variance).toFixed(2)
+  }
+
+  var statsY = L.barsBottomY + 26
+  var statItems = [
+    { label: 'Mean', act: actMean, exp: eMean.toFixed(2) },
+    { label: 'Variance', act: actVar, exp: eVar.toFixed(2) },
+    { label: 'Std Dev', act: actStd, exp: eStd.toFixed(2) },
+  ]
+
+  var totalStatsWidth = 0
+  var dividerSpacing = 16
+  ctx.font =
+    '10px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+  for (var si = 0; si < statItems.length; si++) {
+    var it = statItems[si]
+    var str = it.label + ' ' + it.act + ' (Exp ' + it.exp + ')'
+    var w = ctx.measureText(str).width
+    totalStatsWidth += w
+    if (si < statItems.length - 1) totalStatsWidth += dividerSpacing
+  }
+
+  var startStatsX = (W - totalStatsWidth) / 2
+  var curStatsX = startStatsX
+
+  for (var k = 0; k < statItems.length; k++) {
+    var item = statItems[k]
+
+    // Label
+    ctx.font =
+      '600 9.5px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+    ctx.fillStyle = '#64748b'
+    ctx.textAlign = 'left'
+    var lblText = item.label + ' '
+    ctx.fillText(lblText, curStatsX, statsY)
+    curStatsX += ctx.measureText(lblText).width
+
+    // Actual value
+    ctx.font =
+      '700 10.5px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace'
+    ctx.fillStyle = '#1e293b'
+    var actText = item.act + ' '
+    ctx.fillText(actText, curStatsX, statsY)
+    curStatsX += ctx.measureText(actText).width
+
+    // Expected value
+    ctx.font =
+      '500 9px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace'
+    ctx.fillStyle = '#94a3b8'
+    var expText = '(Exp ' + item.exp + ')'
+    ctx.fillText(expText, curStatsX, statsY)
+    curStatsX += ctx.measureText(expText).width
+
+    // Dot Divider
+    if (k < statItems.length - 1) {
+      curStatsX += dividerSpacing / 2
+      ctx.beginPath()
+      ctx.arc(curStatsX, statsY, 1.5, 0, Math.PI * 2)
+      ctx.fillStyle = '#cbd5e1'
+      ctx.fill()
+      curStatsX += dividerSpacing / 2
+    }
+  }
+  ctx.restore()
 
   for (var bi = 0; bi < activeBalls.length; bi++) {
     var pos = activeBalls[bi].position

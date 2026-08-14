@@ -29,7 +29,7 @@ body {
   font-family:
     -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   max-width: 840px;
-  margin: clamp(8px, calc(8px + var(--vwd) * 0.021053), 16px) auto
+  margin: clamp(12px, calc(12px + var(--vwd) * 0.026316), 24px) auto
     clamp(20px, calc(20px + var(--vwd) * 0.031579), 32px);
   padding: 0 clamp(8px, calc(8px + var(--vwd) * 0.021053), 16px);
   color: var(--text-primary);
@@ -38,22 +38,25 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Header Title */
-.app-header {
-  text-align: center;
-  margin-top: 4px;
-  margin-bottom: 16px;
+/* In-Board Title / Branding */
+.hud-top-left {
+  top: clamp(8px, calc(8px + var(--vwd) * 0.015789), 14px);
+  left: clamp(10px, calc(10px + var(--vwd) * 0.015789), 16px);
+  pointer-events: none;
+  user-select: none;
 }
 
-.app-title {
+.board-title {
   font-family: 'Abril Fatface', 'Cinzel Decorative', 'Rye', serif;
-  font-size: clamp(24px, calc(24px + var(--vwd) * 0.021053), 32px);
+  font-size: clamp(14px, calc(14px + var(--vwd) * 0.010526), 18px);
   font-weight: 400;
-  letter-spacing: 1.2px;
+  letter-spacing: 0.8px;
+  line-height: 1;
   color: #1a1715;
   margin: 0;
-  text-shadow: 2px 3px 0px rgba(0, 0, 0, 0.08);
+  text-shadow: 1.5px 2px 0px rgba(0, 0, 0, 0.06);
   text-transform: capitalize;
+  white-space: nowrap;
 }
 
 /* Game Cabinet Main Container */
@@ -265,6 +268,14 @@ body {
   margin-bottom: 2px;
 }
 
+.settings-row-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 6px;
+  border-top: 1px solid var(--border);
+}
+
 /* Canvas Viewport */
 .canvas-wrapper {
   position: relative;
@@ -319,7 +330,7 @@ body {
   gap: clamp(8px, calc(8px + var(--vwd) * 0.005263), 10px);
 }
 
-/* Shared bar chrome — one visual system, 3 bars escalating in size downward */
+/* Shared bar chrome — one visual system */
 .deck-bar {
   display: flex;
   align-items: center;
@@ -329,63 +340,6 @@ body {
   border: 1px solid var(--border-strong);
   border-radius: var(--radius);
   box-shadow: 0 2px 0 var(--border-strong);
-}
-
-/* Bar 1 (smallest) — Telemetry + Expected Curve */
-.deck-bar-stats {
-  justify-content: flex-start;
-  flex-wrap: wrap;
-  gap: clamp(6px, calc(6px + var(--vwd) * 0.005263), 8px)
-    clamp(8px, calc(8px + var(--vwd) * 0.015789), 14px);
-  padding: 7px 14px;
-}
-
-.deck-stat-item {
-  display: flex;
-  flex: 1 1 0;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: center;
-  gap: 2px;
-  min-width: 70px;
-  white-space: nowrap;
-}
-
-.deck-stat-label {
-  font-size: 10px;
-  color: var(--text-secondary);
-  font-weight: 600;
-  letter-spacing: 0.2px;
-}
-
-.deck-stat-val {
-  font-size: 12px;
-  display: inline-flex;
-  align-items: baseline;
-  gap: 4px;
-}
-
-.stat-actual {
-  color: var(--text-primary);
-  font-weight: 700;
-  font-family: var(--font-mono);
-  font-size: 12px;
-}
-
-.stat-expected {
-  font-size: 10px;
-  color: var(--text-secondary);
-  background: rgba(0, 0, 0, 0.05);
-  padding: 1px 4px;
-  border-radius: 3px;
-  font-weight: 500;
-}
-
-.deck-stat-divider {
-  width: 1px;
-  height: 12px;
-  background: var(--border-strong);
-  opacity: 0.5;
 }
 
 /* Bar 3 (largest) — Ball Controls */

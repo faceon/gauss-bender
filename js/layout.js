@@ -3,7 +3,7 @@ import { state } from './state.js';
 
 export function layout() {
   var N = state.N;
-  var marginX = 40, topY = 30, bottomBarsH = 110, labelH = 22;
+  var marginX = 40, topY = 30, bottomBarsH = 100, labelH = 34;
   var boardH = H - topY - bottomBarsH - labelH;
   var rowHeight = boardH / (N + 1);
   var spacing = Math.min(38, (W - 2 * marginX) / (N + 2));

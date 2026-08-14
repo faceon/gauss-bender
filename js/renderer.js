@@ -204,15 +204,8 @@ export function drawPeg(
   }
 }
 
-export function drawSteelBall(ctx, x, y, r, rY) {
-  var ry = rY !== undefined && rY > 0 ? rY : r
-  var scaleY = ry / r
+export function drawSteelBall(ctx, x, y, r) {
   ctx.save()
-  if (scaleY !== 1) {
-    ctx.translate(x, y)
-    ctx.scale(1, scaleY)
-    ctx.translate(-x, -y)
-  }
   var grad = ctx.createRadialGradient(
     x - r * 0.35,
     y - r * 0.4,
@@ -481,20 +474,22 @@ export function draw(
   zoomY = Math.max(0.1, zoomY)
 
   var yStep = baseStep * zoomY
-  var rBallY = rBall * zoomY
+  // Shrink the ball uniformly (both axes) rather than only vertically, so a
+  // tall stack "zooms out" into smaller round balls instead of squashing
+  // into ellipses.
+  var rBallScaled = rBall * zoomY
 
   landedBallScreens = []
   for (var j = 0; j <= L.N; j++) {
     var bx = binX(L, j)
     var balls = state.binBalls[j]
     for (var idx = 0; idx < balls.length; idx++) {
-      var by = L.barsBottomY - rBallY - idx * yStep
-      drawSteelBall(ctx, bx, by, rBall, rBallY)
+      var by = L.barsBottomY - rBallScaled - idx * yStep
+      drawSteelBall(ctx, bx, by, rBallScaled)
       landedBallScreens.push({
         x: bx,
         y: by,
-        r: rBall,
-        rY: rBallY,
+        r: rBallScaled,
         bin: j,
         idx: idx,
         path: balls[idx],

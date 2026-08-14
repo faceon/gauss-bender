@@ -634,9 +634,15 @@ body {
   box-shadow: 0 0 0 transparent;
 }
 
-.custom-drop-input {
-  width: clamp(34px, 6vw, 40px);
+.drop-count-wrap {
+  display: flex;
+  align-items: stretch;
   height: clamp(28px, 3.8vh, 34px);
+}
+
+.custom-drop-input {
+  width: clamp(30px, 5.2vw, 37px);
+  height: 100%;
   font-size: clamp(11px, 1.4vh, 12.5px);
   font-weight: 600;
   font-family: var(--font-mono);
@@ -645,8 +651,8 @@ body {
   color: var(--text-primary);
   background: #ffffff;
   border: 1px solid var(--border-strong);
-  border-radius: var(--radius-sm);
-  box-shadow: 0 2px 0 var(--border-strong);
+  border-right: none;
+  border-radius: var(--radius-sm) 0 0 var(--radius-sm);
   outline: none;
   box-sizing: border-box;
   -moz-appearance: textfield;
@@ -661,6 +667,72 @@ body {
 .custom-drop-input::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
+}
+
+/* Custom up/down spinner for the drop-count input (native spinners are
+   suppressed above). Press-and-hold acceleration is handled in app.js. */
+.drop-spinner {
+  display: flex;
+  flex-direction: column;
+  width: 15px;
+  box-sizing: border-box;
+}
+
+.drop-spinner-btn {
+  flex: 1 1 0;
+  min-height: 0;
+  padding: 0;
+  margin: 0;
+  border: 1px solid var(--border-strong);
+  background: var(--surface-2);
+  cursor: pointer;
+  position: relative;
+  box-sizing: border-box;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.drop-spinner-btn:first-child {
+  border-bottom: none;
+  border-radius: 0 var(--radius-sm) 0 0;
+}
+
+.drop-spinner-btn:last-child {
+  border-radius: 0 0 var(--radius-sm) 0;
+}
+
+.drop-spinner-btn::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 0;
+  height: 0;
+  border-left: 3px solid transparent;
+  border-right: 3px solid transparent;
+}
+
+.drop-spinner-btn:first-child::before {
+  border-bottom: 4px solid var(--text-secondary);
+  transform: translate(-50%, -65%);
+}
+
+.drop-spinner-btn:last-child::before {
+  border-top: 4px solid var(--text-secondary);
+  transform: translate(-50%, -35%);
+}
+
+.drop-spinner-btn:hover {
+  background: #fbfbfa;
+}
+
+.drop-spinner-btn:hover::before {
+  border-bottom-color: var(--text-primary);
+  border-top-color: var(--text-primary);
+}
+
+.drop-spinner-btn:active {
+  background: #f0efe9;
 }
 
 .btn-drop-custom {

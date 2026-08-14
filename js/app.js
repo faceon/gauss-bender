@@ -553,6 +553,79 @@ if (dropCustomBtn) {
   })
 }
 
+// Drop-count spinner: single click steps by 1; press-and-hold repeats with
+// acceleration (bigger steps, shorter delay the longer it's held) so
+// reaching large counts doesn't take dozens of individual clicks.
+var dropCountInput = document.getElementById('custom-drop-count')
+var dropCountUpBtn = document.getElementById('drop-count-up')
+var dropCountDownBtn = document.getElementById('drop-count-down')
+var dropSpinTimer = null
+
+function stepDropCount(delta) {
+  if (!dropCountInput) return
+  var min = parseInt(dropCountInput.min, 10)
+  if (isNaN(min)) min = 1
+  var max = parseInt(dropCountInput.max, 10)
+  if (isNaN(max)) max = 1000
+  var current = parseInt(dropCountInput.value, 10)
+  if (isNaN(current)) current = min
+  var next = Math.max(min, Math.min(max, current + delta))
+  if (next !== current) dropCountInput.value = next
+}
+
+function stopDropCountSpin() {
+  if (dropSpinTimer) {
+    clearTimeout(dropSpinTimer)
+    dropSpinTimer = null
+  }
+}
+
+function startDropCountSpin(direction) {
+  stopDropCountSpin()
+  stepDropCount(direction)
+  var holdTicks = 0
+  var tick = function () {
+    holdTicks += 1
+    var step =
+      holdTicks < 6 ? 1 : holdTicks < 16 ? 5 : holdTicks < 30 ? 10 : 25
+    var delay = Math.max(35, 200 - holdTicks * 6)
+    stepDropCount(direction * step)
+    dropSpinTimer = setTimeout(tick, delay)
+  }
+  dropSpinTimer = setTimeout(tick, 400)
+}
+
+if (dropCountUpBtn) {
+  dropCountUpBtn.addEventListener('mousedown', function () {
+    startDropCountSpin(1)
+  })
+  dropCountUpBtn.addEventListener(
+    'touchstart',
+    function (e) {
+      e.preventDefault()
+      startDropCountSpin(1)
+    },
+    { passive: false },
+  )
+}
+if (dropCountDownBtn) {
+  dropCountDownBtn.addEventListener('mousedown', function () {
+    startDropCountSpin(-1)
+  })
+  dropCountDownBtn.addEventListener(
+    'touchstart',
+    function (e) {
+      e.preventDefault()
+      startDropCountSpin(-1)
+    },
+    { passive: false },
+  )
+}
+window.addEventListener('mouseup', stopDropCountSpin)
+window.addEventListener('touchend', stopDropCountSpin)
+window.addEventListener('touchcancel', stopDropCountSpin)
+window.addEventListener('blur', stopDropCountSpin)
+
 // Prevent HUD interactions from triggering canvas drag / box-select
 document.querySelectorAll('.hud-overlay, .arcade-deck').forEach(function (el) {
   ;['mousedown', 'touchstart', 'pointerdown'].forEach(function (evt) {

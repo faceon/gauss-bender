@@ -876,8 +876,9 @@ body {
 
 .btn-reset {
   height: clamp(22px, 3.2vh, 26px);
+  width: clamp(52px, 8vw, 62px);
   font-size: clamp(10px, 1.3vh, 11.5px);
-  padding: 0 clamp(6px, 1vw, 10px);
+  padding: 0 clamp(4px, 0.6vw, 8px);
   background: radial-gradient(circle at 35% 25%, #ffd98a 0%, #e6a63a 55%, #a66f15 100%);
   border-color: #7a4f10;
   color: #3a2409;
@@ -954,8 +955,8 @@ body {
 
   /* Controls are in a dedicated column on the right */
   .controls-section {
-    flex: 0 0 clamp(280px, 26vw, 360px);
-    width: clamp(280px, 26vw, 360px);
+    flex: 0 0 clamp(320px, 26vw, 360px);
+    width: clamp(320px, 26vw, 360px);
     height: 100%;
     max-height: 100%;
     border-top: none;

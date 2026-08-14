@@ -27,8 +27,68 @@ var Body = Matter.Body
 
 var canvas = document.getElementById('board')
 var ctx = canvas.getContext('2d')
-canvas.width = W
-canvas.height = H
+
+// Keep the canvas backing store matched to its actual rendered CSS size and
+// the display's device pixel ratio, so drawing stays crisp across window
+// resizes and across screens with different DPRs. Drawing code still works
+// in the fixed W x H logical coordinate space; ctx.setTransform maps that
+// onto the physical pixel grid.
+//
+// The CSS box size is computed from the parent wrapper (not the canvas's
+// own getBoundingClientRect) and applied via canvas.style.width/height.
+// Deriving it from the canvas itself would be circular: an auto-sized
+// canvas's layout box depends on its intrinsic width/height attributes,
+// which is exactly what this function also writes.
+var canvasWrapper = canvas.parentElement
+var aspect = W / H
+
+function resizeCanvas() {
+  var wrapRect = canvasWrapper.getBoundingClientRect()
+  if (wrapRect.width === 0 || wrapRect.height === 0) return
+  var cssW = wrapRect.width
+  var cssH = cssW / aspect
+  if (cssH > wrapRect.height) {
+    cssH = wrapRect.height
+    cssW = cssH * aspect
+  }
+  cssW = Math.max(1, Math.round(cssW))
+  cssH = Math.max(1, Math.round(cssH))
+  canvas.style.width = cssW + 'px'
+  canvas.style.height = cssH + 'px'
+
+  var dpr = window.devicePixelRatio || 1
+  var pixelW = Math.round(cssW * dpr)
+  var pixelH = Math.round(cssH * dpr)
+  if (canvas.width === pixelW && canvas.height === pixelH) return
+  canvas.width = pixelW
+  canvas.height = pixelH
+  ctx.setTransform(pixelW / W, 0, 0, pixelH / H, 0, 0)
+}
+
+resizeCanvas()
+
+if (window.ResizeObserver) {
+  new ResizeObserver(resizeCanvas).observe(canvasWrapper)
+} else {
+  window.addEventListener('resize', resizeCanvas)
+}
+
+// ResizeObserver doesn't fire when the box size is unchanged but the
+// display's device pixel ratio changes (e.g. dragging the window to a
+// monitor with a different DPR), so watch that separately.
+function watchDevicePixelRatio() {
+  var dpr = window.devicePixelRatio || 1
+  var mql = window.matchMedia('(resolution: ' + dpr + 'dppx)')
+  mql.addEventListener(
+    'change',
+    function () {
+      resizeCanvas()
+      watchDevicePixelRatio()
+    },
+    { once: true },
+  )
+}
+watchDevicePixelRatio()
 
 var selectedPegs = []
 var hoveredPeg = null
@@ -53,8 +113,8 @@ function showTooltip(hit) {
   var container = canvas.parentElement
   var rect = canvas.getBoundingClientRect()
   var parentRect = container.getBoundingClientRect()
-  var scaleX = rect.width / canvas.width,
-    scaleY = rect.height / canvas.height
+  var scaleX = rect.width / W,
+    scaleY = rect.height / H
   var left = rect.left - parentRect.left + hit.x * scaleX
   var top = rect.top - parentRect.top + hit.y * scaleY
   tooltip.style.left = left + 'px'
@@ -149,8 +209,8 @@ function resetSelection() {
 
 function getCanvasCoords(clientX, clientY) {
   var rect = canvas.getBoundingClientRect()
-  var scaleX = canvas.width / rect.width,
-    scaleY = canvas.height / rect.height
+  var scaleX = W / rect.width,
+    scaleY = H / rect.height
   return { x: (clientX - rect.left) * scaleX, y: (clientY - rect.top) * scaleY }
 }
 

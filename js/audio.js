@@ -121,20 +121,26 @@ var lastPegTickAt = 0
 
 // Ball bouncing off a peg mid-fall. `activeCount` throttles/quiets the
 // sound so a large batch of simultaneous balls doesn't turn into noise.
+// Peg hits happen far more often than is worth voicing individually, so on
+// top of the time-based throttle, most eligible hits are silently skipped —
+// only a thinned-out, much quieter sample of them actually plays.
 export function pegTick(activeCount) {
   var c = ensureContext()
   if (!c || !enabled) return
   var now = c.currentTime
-  var minGap = activeCount > 20 ? 0.045 : activeCount > 6 ? 0.025 : 0.012
+  var minGap = activeCount > 20 ? 0.09 : activeCount > 6 ? 0.05 : 0.03
   if (now - lastPegTickAt < minGap) return
+
+  var playChance = activeCount > 20 ? 0.2 : activeCount > 6 ? 0.35 : 0.55
+  if (Math.random() > playChance) return
   lastPegTickAt = now
 
   var crowding = Math.min(1, (activeCount || 1) / 15)
   playClick({
-    freq: 1500 + Math.random() * 900,
-    q: 2.2,
-    duration: 0.03,
-    gain: 0.05 * (1 - 0.6 * crowding),
+    freq: 1100 + Math.random() * 500,
+    q: 1.6,
+    duration: 0.022,
+    gain: 0.018 * (1 - 0.5 * crowding),
   })
 }
 

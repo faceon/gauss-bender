@@ -1,7 +1,0 @@
-{
-  "livePreview.defaultPreviewPath": "/index.html",
-  "livePreview.rootPath": "",
-  "livePreview.openPreviewTarget": "Embedded Preview",
-  "livePreview.autoRefreshPreview": "manual",
-  "liveServer.settings.root": "/"
-}

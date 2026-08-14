@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>Bell Curve Bender</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -10,196 +10,202 @@
       href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Cinzel+Decorative:wght@700&family=Rye&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/style.css?v=2" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
   </head>
   <body>
     <!-- Main Game Cabinet Layout -->
     <main class="game-container">
       <div class="game-cabinet">
-        <!-- Floating In-Board Branding (Top Left overlaying canvas) -->
-        <div class="hud-overlay hud-top-left">
-          <h1 class="board-title">Bell Curve Bender</h1>
-        </div>
+        <!-- Board Visual Area -->
+        <div class="board-section">
+          <!-- Floating In-Board Branding (Top Left overlaying canvas) -->
+          <div class="hud-overlay hud-top-left">
+            <h1 class="board-title">Bell Curve Bender</h1>
+          </div>
 
-        <!-- Floating In-Board HUD Panel (Top Right overlaying canvas) -->
-        <div class="hud-overlay hud-top-right">
-          <div class="settings-widget">
-            <button
-              type="button"
-              id="settings-toggle"
-              class="settings-btn"
-              aria-label="Board Settings"
-              aria-expanded="false"
-            >
-              <svg
-                viewBox="0 0 24 24"
-                width="16"
-                height="16"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
+          <!-- Floating In-Board HUD Panel (Top Right overlaying canvas) -->
+          <div class="hud-overlay hud-top-right">
+            <div class="settings-widget">
+              <button
+                type="button"
+                id="settings-toggle"
+                class="settings-btn"
+                aria-label="Board Settings"
+                aria-expanded="false"
               >
-                <circle cx="12" cy="12" r="3"></circle>
-                <path
-                  d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"
-                ></path>
-              </svg>
-            </button>
-            <div class="settings-popover" id="settings-popover">
-              <div class="settings-popover-title">Board Settings</div>
-              <div class="hud-row">
-                <span class="hud-label">Rows (N)</span>
-                <input
-                  type="range"
-                  id="n-slider"
-                  class="hud-slider"
-                  min="1"
-                  max="50"
-                  value="10"
-                  step="1"
-                  autocomplete="off"
-                />
-                <input
-                  type="number"
-                  id="n-out"
-                  class="hud-badge-input"
-                  min="1"
-                  max="50"
-                  value="10"
-                  autocomplete="off"
-                />
-              </div>
-              <div class="settings-row-toggle">
-                <span class="hud-label">Expected Curve</span>
-                <label class="curve-toggle" for="theory-toggle">
-                  <input
-                    type="checkbox"
-                    id="theory-toggle"
-                    class="curve-toggle-input"
-                    checked
-                  />
-                  <span class="curve-toggle-track"
-                    ><span class="curve-toggle-thumb"></span
-                  ></span>
-                </label>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Canvas Viewport -->
-        <div class="canvas-wrapper">
-          <canvas id="board"></canvas>
-          <div id="ball-tooltip" class="tooltip">
-            <div id="tooltip-label" class="tooltip-label"></div>
-            <div id="tooltip-path" class="tooltip-path"></div>
-          </div>
-        </div>
-
-        <!-- Attached Frame Telemetry Strip (Fixed under the board frame, fixed 3-slot layout) -->
-        <div class="board-frame-telemetry">
-          <div class="stat-slot">
-            <span class="stat-slot-label">Mean</span>
-            <span class="stat-slot-val" id="stat-mean">
-              <span class="stat-actual">-</span>
-              <span class="stat-expected">Exp 5.00</span>
-            </span>
-          </div>
-          <div class="stat-slot-divider"></div>
-          <div class="stat-slot">
-            <span class="stat-slot-label">Variance</span>
-            <span class="stat-slot-val" id="stat-var">
-              <span class="stat-actual">-</span>
-              <span class="stat-expected">Exp 2.50</span>
-            </span>
-          </div>
-          <div class="stat-slot-divider"></div>
-          <div class="stat-slot">
-            <span class="stat-slot-label">Std Dev</span>
-            <span class="stat-slot-val" id="stat-std">
-              <span class="stat-actual">-</span>
-              <span class="stat-expected">Exp 1.58</span>
-            </span>
-          </div>
-        </div>
-
-        <!-- Bottom Integrated Arcade Deck: 2 unified bars -->
-        <div class="arcade-deck">
-          <!-- Bar 1 (medium): Primary Controller — P(left) bias -->
-          <div class="deck-bar deck-bar-prob primary-control">
-            <span id="rotate-label" class="primary-control-label">P(left)</span>
-            <input
-              type="text"
-              id="bulk-rotate-out"
-              class="primary-control-value"
-              value="0.5"
-              placeholder="0.5"
-              autocomplete="off"
-            />
-            <input
-              type="range"
-              id="bulk-rotate"
-              class="primary-slider"
-              min="0"
-              max="1"
-              value="0.5"
-              step="0.05"
-              autocomplete="off"
-            />
-            <button
-              type="button"
-              id="reset-pegs"
-              class="btn-arcade btn-neutralize"
-              title="Reset P to 0.5 (Neutral)"
-            >
-              Neutralize
-            </button>
-          </div>
-
-          <!-- Bar 3 (largest): Ball Controls -->
-          <div class="deck-bar deck-bar-balls">
-            <div class="deck-group deck-group-info">
-              <span class="primary-control-label">Balls</span>
-              <div class="balls-count-stack">
-                <span id="stat-n" class="primary-control-value value-badge-balls"
-                  >0</span
+                <svg
+                  viewBox="0 0 24 24"
+                  width="16"
+                  height="16"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
                 >
-                <span id="stat-queued" class="score-queued">+0</span>
+                  <circle cx="12" cy="12" r="3"></circle>
+                  <path
+                    d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"
+                  ></path>
+                </svg>
+              </button>
+              <div class="settings-popover" id="settings-popover">
+                <div class="settings-popover-title">Board Settings</div>
+                <div class="hud-row">
+                  <span class="hud-label">Rows (N)</span>
+                  <input
+                    type="range"
+                    id="n-slider"
+                    class="hud-slider"
+                    min="1"
+                    max="50"
+                    value="10"
+                    step="1"
+                    autocomplete="off"
+                  />
+                  <input
+                    type="number"
+                    id="n-out"
+                    class="hud-badge-input"
+                    min="1"
+                    max="50"
+                    value="10"
+                    autocomplete="off"
+                  />
+                </div>
+                <div class="settings-row-toggle">
+                  <span class="hud-label">Expected Curve</span>
+                  <label class="curve-toggle" for="theory-toggle">
+                    <input
+                      type="checkbox"
+                      id="theory-toggle"
+                      class="curve-toggle-input"
+                      checked
+                    />
+                    <span class="curve-toggle-track"
+                      ><span class="curve-toggle-thumb"></span
+                    ></span>
+                  </label>
+                </div>
               </div>
             </div>
+          </div>
 
-            <div class="deck-group deck-group-drop">
-              <button type="button" id="drop-1" class="btn-arcade btn-drop-1">
-                +1
-              </button>
+          <!-- Canvas Viewport -->
+          <div class="canvas-wrapper">
+            <canvas id="board"></canvas>
+            <div id="ball-tooltip" class="tooltip">
+              <div id="tooltip-label" class="tooltip-label"></div>
+              <div id="tooltip-path" class="tooltip-path"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Controls & Telemetry Section -->
+        <div class="controls-section">
+          <!-- Attached Frame Telemetry Strip (Fixed under the board frame, fixed 3-slot layout) -->
+          <div class="board-frame-telemetry">
+            <div class="stat-slot">
+              <span class="stat-slot-label">Mean</span>
+              <span class="stat-slot-val" id="stat-mean">
+                <span class="stat-actual">-</span>
+                <span class="stat-expected">Exp 5.00</span>
+              </span>
+            </div>
+            <div class="stat-slot-divider"></div>
+            <div class="stat-slot">
+              <span class="stat-slot-label">Variance</span>
+              <span class="stat-slot-val" id="stat-var">
+                <span class="stat-actual">-</span>
+                <span class="stat-expected">Exp 2.50</span>
+              </span>
+            </div>
+            <div class="stat-slot-divider"></div>
+            <div class="stat-slot">
+              <span class="stat-slot-label">Std Dev</span>
+              <span class="stat-slot-val" id="stat-std">
+                <span class="stat-actual">-</span>
+                <span class="stat-expected">Exp 1.58</span>
+              </span>
+            </div>
+          </div>
+
+          <!-- Bottom Integrated Arcade Deck: 2 unified bars -->
+          <div class="arcade-deck">
+            <!-- Bar 1 (medium): Primary Controller — P(left) bias -->
+            <div class="deck-bar deck-bar-prob primary-control">
+              <span id="rotate-label" class="primary-control-label">P(left)</span>
               <input
-                type="number"
-                id="custom-drop-count"
-                class="custom-drop-input"
-                min="1"
-                max="1000"
-                value="50"
+                type="text"
+                id="bulk-rotate-out"
+                class="primary-control-value"
+                value="0.5"
+                placeholder="0.5"
+                autocomplete="off"
+              />
+              <input
+                type="range"
+                id="bulk-rotate"
+                class="primary-slider"
+                min="0"
+                max="1"
+                value="0.5"
+                step="0.05"
+                autocomplete="off"
               />
               <button
                 type="button"
-                id="drop-custom"
-                class="btn-arcade btn-drop-custom"
+                id="reset-pegs"
+                class="btn-arcade btn-neutralize"
+                title="Reset P to 0.5 (Neutral)"
               >
-                Drop
+                Neutralize
               </button>
             </div>
 
-            <div class="deck-group deck-group-actions">
-              <button
-                type="button"
-                id="reset-results"
-                class="btn-arcade btn-reset"
-              >
-                Clear
-              </button>
+            <!-- Bar 3 (largest): Ball Controls -->
+            <div class="deck-bar deck-bar-balls">
+              <div class="deck-group deck-group-info">
+                <span class="primary-control-label">Balls</span>
+                <div class="balls-count-stack">
+                  <span id="stat-n" class="primary-control-value value-badge-balls"
+                    >0</span
+                  >
+                  <span id="stat-queued" class="score-queued">+0</span>
+                </div>
+              </div>
+
+              <div class="deck-group deck-group-drop">
+                <button type="button" id="drop-1" class="btn-arcade btn-drop-1">
+                  +1
+                </button>
+                <input
+                  type="number"
+                  id="custom-drop-count"
+                  class="custom-drop-input"
+                  min="1"
+                  max="1000"
+                  value="50"
+                />
+                <button
+                  type="button"
+                  id="drop-custom"
+                  class="btn-arcade btn-drop-custom"
+                >
+                  Drop
+                </button>
+              </div>
+
+              <div class="deck-group deck-group-actions">
+                <button
+                  type="button"
+                  id="reset-results"
+                  class="btn-arcade btn-reset"
+                >
+                  Clear
+                </button>
+              </div>
             </div>
           </div>
         </div>

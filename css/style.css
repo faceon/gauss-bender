@@ -11,6 +11,8 @@
   --accent-blue-hover: #1d4ed8;
   --accent-glow: rgba(37, 99, 235, 0.25);
   --accent-amber: #d97706;
+  --accent-green: #16a34a;
+  --accent-green-hover: #15803d;
   --radius-lg: 16px;
   --radius: 10px;
   --radius-sm: 6px;
@@ -484,7 +486,7 @@ body {
   -webkit-appearance: none;
   cursor: pointer;
   background: linear-gradient(to right, #3b82f6, #ffffff 50%, #ef4444);
-  accent-color: #3b82f6;
+  accent-color: #64748b;
   border: 1px solid rgba(0, 0, 0, 0.1);
 }
 
@@ -495,7 +497,7 @@ body {
   height: 17px;
   border-radius: 50%;
   background: #ffffff;
-  border: 2.5px solid #2563eb;
+  border: 2.5px solid #64748b;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
   cursor: pointer;
 }
@@ -505,7 +507,7 @@ body {
   height: 17px;
   border-radius: 50%;
   background: #ffffff;
-  border: 2.5px solid #2563eb;
+  border: 2.5px solid #64748b;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
   cursor: pointer;
 }
@@ -662,33 +664,33 @@ body {
 }
 
 .btn-drop-custom {
-  background: var(--accent-blue);
-  border-color: var(--accent-blue-hover);
+  background: var(--accent-green);
+  border-color: var(--accent-green-hover);
   color: #ffffff;
-  box-shadow: 0 2px 0 var(--accent-blue-hover);
+  box-shadow: 0 2px 0 var(--accent-green-hover);
   padding: 0 clamp(7px, 1.2vw, 12px);
 }
 
 .btn-drop-custom:hover {
-  background: var(--accent-blue-hover);
+  background: var(--accent-green-hover);
 }
 
 .btn-reset {
   height: clamp(22px, 3.2vh, 26px);
   font-size: clamp(10px, 1.3vh, 11.5px);
   padding: 0 clamp(6px, 1vw, 10px);
-  background: #fff1f2;
-  border-color: #fecdd3;
-  color: #be123c;
-  box-shadow: 0 1.5px 0 #fecdd3;
+  background: #fffbeb;
+  border-color: #fde68a;
+  color: #b45309;
+  box-shadow: 0 1.5px 0 #fde68a;
   border-radius: var(--radius-sm);
   white-space: nowrap;
   flex: 0 0 auto;
 }
 
 .btn-reset:hover {
-  background: #ffe4e6;
-  border-color: #fda4af;
+  background: #fef3c7;
+  border-color: #fcd34d;
 }
 
 .btn-reset:active {

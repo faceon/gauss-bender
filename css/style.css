@@ -189,6 +189,8 @@ body {
      px matching .canvas-wrapper's box exactly, and drives the logical
      drawing resolution's aspect ratio to match it — these are just a
      pre-JS fallback / upper bound. */
+  width: 100%;
+  height: 100%;
   max-width: 100%;
   max-height: 100%;
   display: block;

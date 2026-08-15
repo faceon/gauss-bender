@@ -976,10 +976,12 @@ body {
     padding: clamp(4px, 1vh, 10px);
   }
 
-  /* Controls are in a dedicated column on the right */
+  /* Controls are in a dedicated column on the right. Narrower than the
+     portrait bottom deck since, unstacked (see below), none of its rows
+     need much width — freeing that space back to the board. */
   .controls-section {
-    flex: 0 0 clamp(320px, 26vw, 360px);
-    width: clamp(320px, 26vw, 360px);
+    flex: 0 0 clamp(190px, 18vw, 220px);
+    width: clamp(190px, 18vw, 220px);
     height: 100%;
     max-height: 100%;
     border-top: none;
@@ -991,6 +993,21 @@ body {
     padding: clamp(6px, 1.5vh, 12px);
     gap: clamp(6px, 1.5vh, 10px);
     box-sizing: border-box;
+    /* Shared column widths for the P(left)/Balls bars below — both grids
+       reference the same custom properties (not independently-computed
+       max-content), so their title/value/action columns land at identical
+       X positions instead of each bar sizing to its own content. Sized to
+       comfortably fit within the narrow column with room to spare: if the
+       columns' combined max size ever has to compete for space, the two
+       bars' minmax(0, …) tracks can resolve to different actual widths
+       under pressure (their content differs) even with identical column
+       definitions, breaking the alignment this is meant to guarantee.
+       .primary-control-value/.btn-reset reuse these same variables as
+       their own width so the value box / action button always exactly
+       fill their column instead of merely fitting inside it. */
+    --col-title: clamp(40px, 6.5vw, 48px);
+    --col-value: clamp(30px, 4.8vw, 36px);
+    --col-action: clamp(46px, 6.5vw, 52px);
   }
 
   .board-frame-telemetry {
@@ -1002,6 +1019,22 @@ body {
       inset 0 2px 6px rgba(0, 0, 0, 0.7),
       0 3px 0 rgba(0, 0, 0, 0.4);
     padding: clamp(5px, 1vh, 8px) clamp(6px, 1vw, 10px);
+    /* Mean / Variance / Std Dev stacked as rows instead of side-by-side
+       columns — a 3-column grid needs far more width than a narrow
+       side column has to spare. */
+    grid-template-columns: 1fr;
+    gap: 3px;
+  }
+
+  .stat-slot {
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .stat-slot-divider {
+    width: 100%;
+    height: 1px;
   }
 
   .arcade-deck {
@@ -1016,9 +1049,94 @@ body {
     padding: clamp(5px, 1vh, 8px) clamp(6px, 1vw, 10px);
   }
 
+  /* P(left) and Balls bars share one grid template (same column widths,
+     same area names) so their title/value/action elements land in
+     identical X positions across the two panes, not just within each bar.
+     minmax(0, ...) lets the fixed columns still compress under a very
+     narrow sidebar instead of overflowing it. */
+  .deck-bar-prob,
   .deck-bar-balls {
-    flex-wrap: nowrap;
-    justify-content: space-between;
+    display: grid;
+    /* Plain fixed-length tracks (not minmax(0, …)) resolve deterministically
+       to exactly --col-title/--col-value/--col-action in both bars. Under
+       space pressure, minmax(0, …)'s content-based shrink algorithm was
+       resolving the *same* variables to different pixel widths in the two
+       grids (their content differs), which broke the cross-pane alignment
+       this is meant to guarantee. The column values are sized with margin
+       to spare (see the variables above) so this shouldn't ever overflow
+       in practice; a fixed track overflowing is still at least consistent
+       between the two bars, unlike a content-dependent shrink. */
+    grid-template-columns: var(--col-title) var(--col-value) 1fr var(--col-action);
+    grid-template-areas: 'title value . action' 'main main main main';
+    row-gap: clamp(5px, 1vh, 8px);
+    column-gap: clamp(3px, 0.6vw, 5px);
+  }
+
+  /* Title and value cells both left-align (justify-self: start), so
+     "P(LEFT)"/"BALLS" share one X position and "0.5"/the ball count share
+     another, regardless of each label/value's own text width. */
+  #rotate-label,
+  .deck-group-info .primary-control-label {
+    grid-area: title;
+    justify-self: start;
+  }
+
+  /* #bulk-rotate-out is an actual input box, so it's widened to exactly
+     fill the value column (overriding its own wider base width) rather
+     than just being told to left-align within it. .balls-count-stack is
+     left as its natural (narrower) width — forcing it to the same width
+     would center its badge away from the column's left edge, since it's
+     a flex column that centers its child. Left-aligning the stack itself
+     keeps the visible badge flush with #bulk-rotate-out's left edge. */
+  #bulk-rotate-out {
+    grid-area: value;
+    justify-self: start;
+    width: var(--col-value);
+  }
+
+  .balls-count-stack {
+    grid-area: value;
+    justify-self: start;
+  }
+
+  /* Both action buttons are widened to exactly fill the column (see
+     .btn-reset override below), so justify-self here is really just a
+     safety net. */
+  #reset-pegs,
+  .deck-group-actions {
+    grid-area: action;
+    justify-self: end;
+  }
+
+  .btn-reset {
+    width: var(--col-action);
+  }
+
+  .primary-slider {
+    grid-area: main;
+    width: 100%;
+  }
+
+  .deck-group-drop {
+    grid-area: main;
+    justify-self: center;
+  }
+
+  /* .deck-group-info's own box is removed from layout (display: contents)
+     so its label + value-badge children become direct grid items and can
+     be placed in the title/value columns individually, instead of moving
+     together as one wide "info" block that wouldn't line up with the
+     P(left) bar's separate label/value columns. */
+  .deck-group-info {
+    display: contents;
+  }
+
+  /* Matches #bulk-rotate-out's height exactly (the base .value-badge-balls
+     rule is taller) so both bars' row 1 are the same height and stay in
+     vertical lockstep, not just aligned column-by-column. */
+  .deck-bar-balls .value-badge-balls {
+    height: clamp(22px, 3.2vh, 26px);
+    line-height: clamp(20px, 3.2vh, 24px);
   }
 
   /* Compact controls on short mobile landscape viewports */

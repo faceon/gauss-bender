@@ -693,6 +693,13 @@ window.addEventListener('mouseup', function (e) {
 canvas.addEventListener(
   'touchstart',
   function (e) {
+    // A second finger means the user is starting a pinch-zoom, not a peg
+    // drag — bail out without preventDefault() so the browser's native
+    // pinch gesture (enabled via touch-action: pinch-zoom) can take over.
+    if (e.touches.length > 1) {
+      endDrag()
+      return
+    }
     if (e.touches.length > 0) {
       startDrag(e.touches[0].clientX, e.touches[0].clientY, false)
     }
@@ -704,6 +711,9 @@ canvas.addEventListener(
 canvas.addEventListener(
   'touchmove',
   function (e) {
+    if (e.touches.length > 1) {
+      return
+    }
     if (e.touches.length > 0) {
       moveDrag(e.touches[0].clientX, e.touches[0].clientY)
     }

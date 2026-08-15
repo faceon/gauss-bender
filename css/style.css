@@ -145,7 +145,10 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  touch-action: none;
+  /* Single-finger touches stay JS-driven (peg drag / box-select — see
+     app.js), but two-finger pinch is left to the browser so mobile users
+     can still zoom in on the board. */
+  touch-action: pinch-zoom;
 }
 
 /* Sizer that exactly matches the canvas's rendered box (same aspect-ratio /
@@ -195,7 +198,7 @@ body {
   height: auto;
   display: block;
   cursor: pointer;
-  touch-action: none;
+  touch-action: pinch-zoom;
   border-radius: 10px;
   background: radial-gradient(
     ellipse at 50% 4%,
@@ -452,6 +455,10 @@ body {
   background: linear-gradient(180deg, rgba(0, 0, 0, 0.12), rgba(0, 0, 0, 0.28));
   border-top: 2px solid var(--wood-edge);
   z-index: 10;
+  /* Sliders/buttons here don't benefit from zooming — pinch-zoom starting
+     on this panel is unwanted, but keep normal single-finger panning
+     (needed for the scrollable controls column in landscape). */
+  touch-action: pan-x pan-y;
 }
 
 /* Telemetry Strip: recessed LED scoreboard */
@@ -765,7 +772,10 @@ body {
 .drop-count-wrap {
   display: flex;
   align-items: stretch;
+  /* Matches .btn-drop-custom's min-height so the spinner buttons beside it
+     get a taller, easier-to-tap touch target on mobile. */
   height: clamp(28px, 3.8vh, 34px);
+  min-height: 42px;
 }
 
 .custom-drop-input {
@@ -804,7 +814,7 @@ body {
 .drop-spinner {
   display: flex;
   flex-direction: column;
-  width: 15px;
+  width: 26px;
   box-sizing: border-box;
 }
 
@@ -838,17 +848,17 @@ body {
   top: 50%;
   width: 0;
   height: 0;
-  border-left: 3px solid transparent;
-  border-right: 3px solid transparent;
+  border-left: 4.5px solid transparent;
+  border-right: 4.5px solid transparent;
 }
 
 .drop-spinner-btn:first-child::before {
-  border-bottom: 4px solid var(--text-ink);
+  border-bottom: 6px solid var(--text-ink);
   transform: translate(-50%, -65%);
 }
 
 .drop-spinner-btn:last-child::before {
-  border-top: 4px solid var(--text-ink);
+  border-top: 6px solid var(--text-ink);
   transform: translate(-50%, -35%);
 }
 

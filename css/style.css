@@ -1067,7 +1067,10 @@ body {
       padding: 0 6px;
     }
     .custom-drop-input {
-      height: 28px;
+      /* No height override here — let it inherit height: 100% from the
+         base rule so it always matches .drop-count-wrap's actual height
+         (42px, via that rule's min-height) instead of drifting out of
+         alignment with the taller spinner buttons beside it. */
       width: 34px;
       font-size: 10.5px;
     }

@@ -5,6 +5,7 @@ import {
   buildPegProb,
   buildBinBalls,
   computeExpected,
+  formatCount,
 } from './math.js'
 import { pegTick, ballLand as playBallLand } from './audio.js'
 
@@ -67,10 +68,10 @@ export function updateStats() {
   var statVar = document.getElementById('stat-var')
   var statStd = document.getElementById('stat-std')
 
-  if (statN) statN.textContent = state.total
+  if (statN) statN.textContent = formatCount(state.total)
   if (statQueued) {
     var queued = state.batchTotal - state.batchSpawned
-    statQueued.textContent = '+' + queued
+    statQueued.textContent = '+' + formatCount(queued)
     statQueued.classList.toggle('is-active', queued > 0)
   }
   var expected = computeExpected(L)

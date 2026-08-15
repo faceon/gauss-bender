@@ -25,7 +25,6 @@ export function setBoardAspect(aspect) {
 export var COLOR_PEG = '#cbb896';
 export var COLOR_LEFT_BIAS = '#534AB7';
 export var COLOR_RIGHT_BIAS = '#D85A30';
-export var COLOR_THEORY = '#eecd82';
 export var COLOR_SELECTED = '#378ADD';
 export var COLOR_HOVER_PEG = '#EF9F27';
 export var COLOR_L = '#378ADD';

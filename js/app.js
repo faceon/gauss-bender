@@ -590,16 +590,6 @@ document.getElementById('reset-pegs').addEventListener('click', function () {
   updateRotateUI()
 })
 
-var dropCustomBtn = document.getElementById('drop-custom')
-if (dropCustomBtn) {
-  dropCustomBtn.addEventListener('click', function () {
-    var input = document.getElementById('custom-drop-count')
-    var val = input ? parseInt(input.value, 10) : 50
-    var count = isNaN(val) || val < 1 ? 1 : val
-    dropPhysics(count)
-  })
-}
-
 // Drop-count spinner: single click steps by 1; press-and-hold repeats with
 // acceleration (bigger steps, shorter delay the longer it's held) so
 // reaching large counts doesn't take dozens of individual clicks.
@@ -608,15 +598,49 @@ var dropCountUpBtn = document.getElementById('drop-count-up')
 var dropCountDownBtn = document.getElementById('drop-count-down')
 var dropSpinTimer = null
 
-function stepDropCount(delta) {
-  if (!dropCountInput) return
+function getDropCountBounds() {
   var min = parseInt(dropCountInput.min, 10)
   if (isNaN(min)) min = 1
   var max = parseInt(dropCountInput.max, 10)
   if (isNaN(max)) max = 1000
+  return { min: min, max: max }
+}
+
+// Typing directly into the box (unlike the spinner buttons, which already
+// clamp via stepDropCount below) bypasses the max="1000" attribute — browsers
+// only flag it :invalid, they don't stop you entering e.g. 50000. Clamp on
+// blur/change so the box can't be left holding a value past max.
+function clampDropCountInput() {
+  if (!dropCountInput) return
+  var bounds = getDropCountBounds()
   var current = parseInt(dropCountInput.value, 10)
-  if (isNaN(current)) current = min
-  var next = Math.max(min, Math.min(max, current + delta))
+  var clamped = isNaN(current)
+    ? bounds.min
+    : Math.max(bounds.min, Math.min(bounds.max, current))
+  if (String(clamped) !== dropCountInput.value) dropCountInput.value = clamped
+}
+
+if (dropCountInput) {
+  dropCountInput.addEventListener('change', clampDropCountInput)
+  dropCountInput.addEventListener('blur', clampDropCountInput)
+}
+
+var dropCustomBtn = document.getElementById('drop-custom')
+if (dropCustomBtn) {
+  dropCustomBtn.addEventListener('click', function () {
+    clampDropCountInput()
+    var val = dropCountInput ? parseInt(dropCountInput.value, 10) : 50
+    var count = isNaN(val) || val < 1 ? 1 : val
+    dropPhysics(count)
+  })
+}
+
+function stepDropCount(delta) {
+  if (!dropCountInput) return
+  var bounds = getDropCountBounds()
+  var current = parseInt(dropCountInput.value, 10)
+  if (isNaN(current)) current = bounds.min
+  var next = Math.max(bounds.min, Math.min(bounds.max, current + delta))
   if (next !== current) dropCountInput.value = next
 }
 

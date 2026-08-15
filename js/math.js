@@ -79,4 +79,16 @@ export function formatProb(prob) {
   return String(rounded);
 }
 
+// Ball counts/queued totals are unbounded (they only grow as more balls are
+// dropped), but the telemetry badges only have room budgeted for 4 digits.
+// Past that, collapse to thousands with a comma (e.g. 4123456 -> "4,123K")
+// instead of letting the raw digit string keep growing the badge forever.
+export function formatCount(n) {
+  var abs = Math.abs(n);
+  if (abs < 10000) return String(n);
+  var thousands = Math.floor(abs / 1000);
+  var sign = n < 0 ? '-' : '';
+  return sign + thousands.toLocaleString('en-US') + 'K';
+}
+
 

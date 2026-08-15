@@ -5,7 +5,6 @@ import {
   COLOR_PEG,
   COLOR_LEFT_BIAS,
   COLOR_RIGHT_BIAS,
-  COLOR_THEORY,
   COLOR_SELECTED,
   COLOR_HOVER_PEG,
   COLOR_L,
@@ -35,7 +34,32 @@ export function getDeflectorColor(pLeft) {
     var b = Math.round(255 + (68 - 255) * t)
     return 'rgb(' + r + ',' + g + ',' + b + ')'
   }
-  return '#FFFFFF'
+  return 'rgb(255,255,255)'
+}
+
+// Reads the r,g,b components back out of a getDeflectorColor() result so
+// the theory curve's fill gradient can reuse the same color at partial
+// alpha, instead of hardcoding a separate color for the fill.
+function rgbToRgba(rgb, alpha) {
+  var match = /rgb\((\d+),\s*(\d+),\s*(\d+)\)/.exec(rgb)
+  if (!match) return rgb
+  return 'rgba(' + match[1] + ',' + match[2] + ',' + match[3] + ',' + alpha + ')'
+}
+
+// The expected-curve dotted line has no single peg to key its color off of,
+// so it uses the board's overall bias instead — the same blue/white/red
+// rule as an individual deflector, applied to the average pLeft across
+// every peg.
+export function getAveragePegProb() {
+  var sum = 0
+  var count = 0
+  for (var row = 0; row < state.pegProb.length; row++) {
+    for (var k = 0; k < state.pegProb[row].length; k++) {
+      sum += state.pegProb[row][k]
+      count++
+    }
+  }
+  return count > 0 ? sum / count : 0.5
 }
 
 export function getNormalLineColor(pLeft) {
@@ -541,13 +565,14 @@ export function draw(
       }
 
       var ctrl = getMonotoneCubicControlPoints(pts, L.barsBottomY)
+      var curveColor = getDeflectorColor(getAveragePegProb())
 
       ctx.save()
 
       // Smooth gradient fill under Monotone Cubic curve
       var grad = ctx.createLinearGradient(0, L.landY, 0, L.barsBottomY)
-      grad.addColorStop(0, 'rgba(238, 205, 130, 0.22)')
-      grad.addColorStop(1, 'rgba(238, 205, 130, 0.02)')
+      grad.addColorStop(0, rgbToRgba(curveColor, 0.22))
+      grad.addColorStop(1, rgbToRgba(curveColor, 0.02))
 
       ctx.beginPath()
       ctx.moveTo(pts[0].x, L.barsBottomY)
@@ -582,7 +607,7 @@ export function draw(
           pts[i2 + 1].y,
         )
       }
-      ctx.strokeStyle = COLOR_THEORY
+      ctx.strokeStyle = curveColor
       ctx.lineWidth = 2.0
       ctx.setLineDash([5, 4])
       ctx.stroke()
@@ -592,7 +617,7 @@ export function draw(
       for (var pIdx = 0; pIdx < pts.length; pIdx++) {
         ctx.beginPath()
         ctx.arc(pts[pIdx].x, pts[pIdx].y, 2.0, 0, Math.PI * 2)
-        ctx.fillStyle = COLOR_THEORY
+        ctx.fillStyle = curveColor
         ctx.fill()
       }
 

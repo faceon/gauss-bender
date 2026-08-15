@@ -450,10 +450,9 @@ body {
   background: linear-gradient(180deg, rgba(0, 0, 0, 0.12), rgba(0, 0, 0, 0.28));
   border-top: 2px solid var(--wood-edge);
   z-index: 10;
-  /* Sliders/buttons here don't benefit from zooming — pinch-zoom starting
-     on this panel is unwanted, but keep normal single-finger panning
-     (needed for the scrollable controls column in landscape). */
-  touch-action: pan-x pan-y;
+  /* Allow pinch-zooming across the whole UI while keeping normal
+     single-finger panning for the scrollable controls column in landscape. */
+  touch-action: pan-x pan-y pinch-zoom;
 }
 
 /* Telemetry Strip: recessed LED scoreboard */

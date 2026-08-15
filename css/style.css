@@ -151,26 +151,20 @@ body {
   touch-action: pinch-zoom;
 }
 
-/* Sizer that exactly matches the canvas's rendered box (same aspect-ratio /
-   max-size fit as the canvas, absolutely centered over it), so HUD overlays
-   anchored to it sit inside the chalkboard itself rather than the wood
-   frame around it. */
+/* Sizer that exactly matches the canvas's rendered box. The canvas itself
+   fills .canvas-wrapper exactly (app.js's resizeCanvas sets its logical
+   aspect to match the wrapper, so pegs/bins are never letterboxed down to
+   bars), so this just mirrors the same box so HUD overlays anchored to it
+   sit inside the chalkboard itself rather than the wood frame around it. */
 .board-frame {
   position: absolute;
   inset: 0;
-  margin: auto;
-  max-width: 100%;
-  max-height: 100%;
-  aspect-ratio: 640 / 414;
-  width: auto;
-  height: auto;
   z-index: 2;
   pointer-events: none;
   /* Lets HUD overlays (title, settings dial) size themselves off the
-     board's own rendered box via cqh/cqw instead of the raw viewport.
-     Needed because on a tall portrait phone the board is letterboxed
-     down to a fraction of the viewport height, so vh-based sizing would
-     make the title balloon far past what fits the actual board. */
+     board's own rendered box via cqh/cqw instead of the raw viewport,
+     which would size the title off the wrong dimension whenever the
+     board is much taller/narrower than the raw viewport. */
   container-type: size;
   container-name: board;
 }
@@ -191,11 +185,12 @@ body {
 }
 
 #board {
+  /* JS (resizeCanvas in app.js) sets an explicit inline width/height in
+     px matching .canvas-wrapper's box exactly, and drives the logical
+     drawing resolution's aspect ratio to match it — these are just a
+     pre-JS fallback / upper bound. */
   max-width: 100%;
   max-height: 100%;
-  aspect-ratio: 640 / 414;
-  width: auto;
-  height: auto;
   display: block;
   cursor: pointer;
   touch-action: pinch-zoom;

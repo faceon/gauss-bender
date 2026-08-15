@@ -1,4 +1,4 @@
-import { W, H, COLOR_L, COLOR_R } from './constants.js'
+import { W, H, COLOR_L, COLOR_R, setBoardAspect } from './constants.js'
 import { state } from './state.js'
 import { pegX, binX, getTargetStackY } from './layout.js'
 import {
@@ -13,6 +13,7 @@ import {
   activeBalls,
   currentL,
   rebuildBoard,
+  relayoutBoard,
   updateStats,
   landBall,
   dropPhysics,
@@ -45,30 +46,35 @@ var ctx = canvas.getContext('2d')
 // Deriving it from the canvas itself would be circular: an auto-sized
 // canvas's layout box depends on its intrinsic width/height attributes,
 // which is exactly what this function also writes.
+//
+// The canvas fills the wrapper exactly (no fixed-aspect letterboxing) —
+// setBoardAspect() below re-derives the logical W to match the wrapper's
+// aspect ratio every time, so the board (pegs/bins) always fills the space
+// it's given instead of shrinking to bars on unusual screen shapes.
 var canvasWrapper = canvas.parentElement
-var aspect = W / H
 
 function resizeCanvas() {
   var wrapRect = canvasWrapper.getBoundingClientRect()
   if (wrapRect.width === 0 || wrapRect.height === 0) return
-  var cssW = wrapRect.width
-  var cssH = cssW / aspect
-  if (cssH > wrapRect.height) {
-    cssH = wrapRect.height
-    cssW = cssH * aspect
-  }
-  cssW = Math.max(1, Math.round(cssW))
-  cssH = Math.max(1, Math.round(cssH))
+  var cssW = Math.max(1, Math.round(wrapRect.width))
+  var cssH = Math.max(1, Math.round(wrapRect.height))
   canvas.style.width = cssW + 'px'
   canvas.style.height = cssH + 'px'
+  setBoardAspect(cssW / cssH)
 
   var dpr = window.devicePixelRatio || 1
   var pixelW = Math.round(cssW * dpr)
   var pixelH = Math.round(cssH * dpr)
-  if (canvas.width === pixelW && canvas.height === pixelH) return
-  canvas.width = pixelW
-  canvas.height = pixelH
+  // Reassigning canvas.width/height clears the backing store, so it's
+  // skipped when the pixel size hasn't changed — but setTransform and
+  // relayoutBoard still need to run every time, since the logical aspect
+  // (W) can change independently of the physical pixel size.
+  if (canvas.width !== pixelW || canvas.height !== pixelH) {
+    canvas.width = pixelW
+    canvas.height = pixelH
+  }
   ctx.setTransform(pixelW / W, 0, 0, pixelH / H, 0, 0)
+  relayoutBoard()
 }
 
 resizeCanvas()

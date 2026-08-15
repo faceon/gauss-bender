@@ -21,6 +21,8 @@ world.gravity.y = 1
 export var activeBalls = []
 export var currentL = null
 export var dropTimers = []
+var leftWall = null
+var rightWall = null
 
 // Soft "tick" whenever a falling ball bounces off a peg. Throttled inside
 // pegTick() so a large batch of simultaneous balls stays subtle rather than
@@ -150,11 +152,43 @@ export function rebuildBoard(resetSelectionCallback, forceResetPegProb) {
     }
   }
   var wallOpts = { isStatic: true, restitution: 0.15 }
-  Composite.add(world, [
-    Bodies.rectangle(L.marginX - 12, H / 2, 6, H, wallOpts),
-    Bodies.rectangle(W - L.marginX + 12, H / 2, 6, H, wallOpts),
-  ])
+  leftWall = Bodies.rectangle(L.marginX - 12, H / 2, 6, H, wallOpts)
+  rightWall = Bodies.rectangle(W - L.marginX + 12, H / 2, 6, H, wallOpts)
+  Composite.add(world, [leftWall, rightWall])
   updateStats()
+}
+
+// Re-derives peg/wall positions for the current W (which setBoardAspect may
+// have just changed on resize) without touching balls or stats. A full
+// rebuildBoard() clears the world and zeroes state.binCounts/state.total,
+// which would wipe a user's results every time they rotate their phone or
+// resize the window — this only moves the static bodies that define the
+// board's shape.
+export function relayoutBoard() {
+  if (!currentL) return
+  currentL = layout()
+  var L = currentL
+  var effectivePegR = Math.max(
+    1.0,
+    Math.min(PEG_R, Math.min(L.spacing * 0.35, L.rowHeight * 0.35)),
+  )
+  var pegs = Composite.allBodies(world).filter(function (b) {
+    return b.isPeg
+  })
+  for (var i = 0; i < pegs.length; i++) {
+    var body = pegs[i]
+    Body.setPosition(body, {
+      x: pegX(L, body.pegRow, body.pegIdx),
+      y: L.topY + body.pegRow * L.rowHeight,
+    })
+    Body.scale(
+      body,
+      effectivePegR / body.circleRadius,
+      effectivePegR / body.circleRadius,
+    )
+  }
+  if (leftWall) Body.setPosition(leftWall, { x: L.marginX - 12, y: H / 2 })
+  if (rightWall) Body.setPosition(rightWall, { x: W - L.marginX + 12, y: H / 2 })
 }
 
 export function getBallRadii(L) {

@@ -85,6 +85,48 @@ if (window.ResizeObserver) {
   window.addEventListener('resize', resizeCanvas)
 }
 
+function resetViewportScroll() {
+  if (window.scrollY !== 0 || window.scrollX !== 0) {
+    window.scrollTo(0, 0)
+  }
+  if (document.documentElement && document.documentElement.scrollTop !== 0) {
+    document.documentElement.scrollTop = 0
+  }
+  if (document.body && document.body.scrollTop !== 0) {
+    document.body.scrollTop = 0
+  }
+}
+
+if ('scrollRestoration' in history) {
+  history.scrollRestoration = 'manual'
+}
+
+resetViewportScroll()
+
+window.addEventListener('pageshow', function () {
+  resetViewportScroll()
+  resizeCanvas()
+})
+
+document.addEventListener('visibilitychange', function () {
+  if (!document.hidden) {
+    resetViewportScroll()
+    resizeCanvas()
+  }
+})
+
+window.addEventListener('orientationchange', function () {
+  setTimeout(function () {
+    resetViewportScroll()
+    resizeCanvas()
+  }, 100)
+})
+
+if (window.visualViewport) {
+  window.visualViewport.addEventListener('resize', resetViewportScroll)
+  window.visualViewport.addEventListener('scroll', resetViewportScroll)
+}
+
 // ResizeObserver doesn't fire when the box size is unchanged but the
 // display's device pixel ratio changes (e.g. dragging the window to a
 // monitor with a different DPR), so watch that separately.
@@ -432,6 +474,9 @@ if (nOutEl) {
   nOutEl.addEventListener('change', function (e) {
     setNRows(e.target.value)
   })
+  nOutEl.addEventListener('blur', function () {
+    setTimeout(resetViewportScroll, 50)
+  })
   nOutEl.addEventListener('keyup', function (e) {
     if (e.key === 'Enter') {
       setNRows(e.target.value)
@@ -498,6 +543,7 @@ if (bulkRotateOut) {
   })
   bulkRotateOut.addEventListener('blur', function () {
     isSliderActive = false
+    setTimeout(resetViewportScroll, 50)
   })
   bulkRotateOut.addEventListener('change', function (e) {
     applyPegRotation(e.target.value, true)
@@ -622,7 +668,10 @@ function clampDropCountInput() {
 
 if (dropCountInput) {
   dropCountInput.addEventListener('change', clampDropCountInput)
-  dropCountInput.addEventListener('blur', clampDropCountInput)
+  dropCountInput.addEventListener('blur', function () {
+    clampDropCountInput()
+    setTimeout(resetViewportScroll, 50)
+  })
 }
 
 var dropCustomBtn = document.getElementById('drop-custom')
